@@ -201,23 +201,24 @@
         return true;
     }
 
+    // Funzione di registrazione corretta per Snap!
     function register(name, fn) {
-    SnapExtensions.primitives.set(name, function () {
-        // Converte gli argomenti in un array e li passa alla funzione originale
-        var args = Array.prototype.slice.call(arguments);
-        // Applica la funzione con il contesto corretto (this) e tutti gli argomenti
-        return fn.apply(this, args);
-    });
+        SnapExtensions.primitives.set(name, function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(this, args);
+        });
+    }
 
-    register("key_init()", function () { return init(); });
+    // Registrazione dei blocchi con la sintassi corretta di Snap! (senza parentesi vuote, con % per i parametri)
+    register("key_init", function () { return init(); });
     register("key_ready?", function () { return !!api; });
-    register("key_set(c0, prop, tass, inv, sp)", function (c0, prop, tass, inv, sp) {
+    register("key_set %c0 %prop %tass %inv %sp", function (c0, prop, tass, inv, sp) {
         return setParams(c0, prop, tass, inv, sp);
     });
-    register("key_y_equilibrio()", function () { return readY(); });
-    register("key_moltiplicatore()", function () { return readK(); });
-    register("key_mostra()", function () { return show(); });
-    register("key_nascondi()", function () { return hide(); });
-    register("key_errore()", function () { return loadError; });
+    register("key_y_equilibrio", function () { return readY(); });
+    register("key_moltiplicatore", function () { return readK(); });
+    register("key_mostra", function () { return show(); });
+    register("key_nascondi", function () { return hide(); });
+    register("key_errore", function () { return loadError; });
 
 }());
