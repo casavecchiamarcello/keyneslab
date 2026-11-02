@@ -202,8 +202,12 @@
     }
 
     function register(name, fn) {
-        SnapExtensions.primitives.set(name, fn);
-    }
+    SnapExtensions.primitives.set(name, function () {
+        // Converte gli argomenti in un array e li passa alla funzione originale
+        var args = Array.prototype.slice.call(arguments);
+        // Applica la funzione con il contesto corretto (this) e tutti gli argomenti
+        return fn.apply(this, args);
+    });
 
     register("key_init()", function () { return init(); });
     register("key_ready?", function () { return !!api; });
