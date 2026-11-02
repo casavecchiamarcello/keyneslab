@@ -1,19 +1,12 @@
-/*
- * KEYNESLAB - estensione didattica per Snap!
- * Integra un pannello GeoGebra nella stessa pagina dell'IDE Snap!
- *
- * Uso:
- * 1) Abilitare in Snap! Settings > JavaScript extensions.
- * 2) Caricare questo file con il blocco src_load(URL_DEL_FILE).
- * 3) Usare i blocchi "extension" (o blocchi personalizzati che li racchiudono).
- *
- * NOTA: il file deve essere raggiungibile via HTTPS e consentire il caricamento
- * cross-origin. Per una distribuzione stabile usare un URL GitHub Pages o
- * un server locale che ospiti anche Snap! sullo stesso origin.
- */
+console.log("KeynesLab: il file JS è stato scaricato e si sta avviando!");
 
 (function () {
     "use strict";
+
+    if (typeof SnapExtensions === 'undefined') {
+        console.error("KeynesLab ERRORE: SnapExtensions non è definito. Le estensioni JS non sono attive.");
+        return;
+    }
 
     var api = null;
     var applet = null;
@@ -180,28 +173,20 @@
         return true;
     }
 
-    function readY() {
-        return api ? api.getValue("Yeq") : -1;
-    }
-
-    function readK() {
-        return api ? api.getValue("mol") : -1;
-    }
-
+    function readY() { return api ? api.getValue("Yeq") : -1; }
+    function readK() { return api ? api.getValue("mol") : -1; }
     function show() {
         var p = ensurePanel();
         p.style.display = "flex";
         if (!api && !loading) init();
         return true;
     }
-
     function hide() {
         var p = panel();
         if (p) p.style.display = "none";
         return true;
     }
 
-    // Funzione di registrazione corretta per Snap!
     function register(name, fn) {
         SnapExtensions.primitives.set(name, function () {
             var args = Array.prototype.slice.call(arguments);
@@ -209,16 +194,20 @@
         });
     }
 
-    // Registrazione dei blocchi con la sintassi corretta di Snap! (senza parentesi vuote, con % per i parametri)
+    // Registrazione dei blocchi
     register("key_init", function () { return init(); });
     register("key_ready?", function () { return !!api; });
-    register("key_set %c0 %prop %tass %inv %sp", function (c0, prop, tass, inv, sp) {
+    
+    // QUI C'ERA IL BUG: %c0 creava un selettore di colore. Ora usa %n (numeri)
+    register("key_set %n %n %n %n %n", function (c0, prop, tass, inv, sp) {
         return setParams(c0, prop, tass, inv, sp);
     });
+    
     register("key_y_equilibrio", function () { return readY(); });
     register("key_moltiplicatore", function () { return readK(); });
     register("key_mostra", function () { return show(); });
     register("key_nascondi", function () { return hide(); });
     register("key_errore", function () { return loadError; });
 
+    console.log("KeynesLab: Blocchi registrati con successo!");
 }());
